@@ -4,6 +4,7 @@
 #include <cmath>
 #include "coordinate.h"
 #include "color.h"
+#include "functional.h"
 
 using Fraction = double;
 
@@ -52,12 +53,18 @@ Base_image<T> scale(Base_image<T> image, double s) {
 }
 
 template<typename T>
-Base_image<T> circle(Point q, double r, T inner, T outer) {
-    return [q, r, inner, outer](const Point p) {
-        return to_polar(Point(
-                p.first - q.first, p.second - q.second, false
-        )).first <= r ? inner : outer;
+Base_image<T> vertical_stripe(double d, T this_way, T that_way) {
+    return [d, this_way, that_way](const Point p) {
+        return fabs(p.first) <= d / 2 ? this_way : that_way;
     };
+}
+
+template<typename T>
+Base_image<T> circle(Point q, double r, T inner, T outer) {
+    return translate(static_cast<Base_image<T>>(
+                             compose(to_polar,
+                                     vertical_stripe(2 * r, inner, outer))),
+                     std::make_pair(q.first, q.second));
 }
 
 template<typename T>
@@ -80,28 +87,15 @@ Base_image<T> polar_checker(double d, int n, T this_way, T that_way) {
 
 template<typename T>
 Base_image<T> rings(Point q, double d, T this_way, T that_way) {
-    return [q, d, this_way, that_way](const Point p) {
-        int parity = std::abs(static_cast<int>(std::floor(
-                to_polar(
-                        Point(p.first - q.first, p.second - q.second,
-                              false)
-                ).first / d
-        ))) % 2;
-        return !parity ? this_way : that_way;
-    };
+    return translate(static_cast<Base_image<T>>(
+                             compose(to_polar, checker(d, this_way, that_way))
+                     ), std::make_pair(q.first, q.second));
 }
 
-template<typename T>
-Base_image<T> vertical_stripe(double d, T this_way, T that_way) {
-    return [d, this_way, that_way](const Point p) {
-        return fabs(p.first) <= d / 2 ? this_way : that_way;
-    };
-}
+Image cond(const Region &region, const Image &this_way, const Image &that_way);
 
-Image cond(Region region, Image this_way, Image that_way);
+Image lerp(const Blend &blend, const Image &this_way, const Image &that_way);
 
-Image lerp(Blend blend, Image this_way, Image that_way);
+Image darken(const Image &image, const Blend &blend);
 
-Image darken(Image image, Blend blend);
-
-Image lighten(Image image, Blend blend);
+Image lighten(const Image &image, const Blend &blend);
