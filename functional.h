@@ -1,9 +1,6 @@
 #pragma once
 
-
-#include <iostream>
-
-template<typename... Rest>
+template<typename... Fs>
 auto compose() {
     return [](const auto &x) {
         return x;
