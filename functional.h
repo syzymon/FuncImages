@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FUNCTIONAL_H
+#define FUNCTIONAL_H
 
 template<typename... Fs>
 auto compose() {
@@ -27,3 +28,5 @@ auto lift(const H &h, const Fs &... fs) {
         return h(fs(p)...);
     };
 }
+
+#endif  // FUNCTIONAL_H

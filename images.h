@@ -1,4 +1,5 @@
-#pragma once
+#ifndef IMAGES_H
+#define IMAGES_H
 
 #include <functional>
 #include <cmath>
@@ -99,3 +100,5 @@ Image lerp(const Blend &blend, const Image &this_way, const Image &that_way);
 Image darken(const Image &image, const Blend &blend);
 
 Image lighten(const Image &image, const Blend &blend);
+
+#endif  // IMAGES_H
